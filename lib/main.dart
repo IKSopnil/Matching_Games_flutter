@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/services.dart';
@@ -47,6 +48,8 @@ class _MyGameState extends State<MyGame> with TickerProviderStateMixin {
       false; // Track whether blast animation should be visible or not
   int score = 0;
   int highScore = 0;
+  int remainingTime = 130;
+  late Timer _timer;
 
   @override
   void initState() {
@@ -61,11 +64,25 @@ class _MyGameState extends State<MyGame> with TickerProviderStateMixin {
       parent: _controller,
       curve: Curves.easeInOut,
     );
+
+    // Start the timer when the game starts
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        remainingTime--;
+        if (remainingTime <= 0) {
+          timer.cancel(); // Stop the timer
+          if (!_checkAllSameColor()) {
+            _showGameOver(); // Display "GAME OVER" if all boxes are not matched
+          }
+        }
+      });
+    });
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _timer.cancel(); // Cancel the timer to prevent memory leaks
     super.dispose();
   }
 
@@ -113,6 +130,7 @@ class _MyGameState extends State<MyGame> with TickerProviderStateMixin {
             score; // Update high score only if current score beats high score
       }
       score = 0;
+      remainingTime = 130; // Reset the remaining time
     });
   }
 
@@ -142,6 +160,40 @@ class _MyGameState extends State<MyGame> with TickerProviderStateMixin {
     _audioCache.play('firecracker.mp3');
   }
 
+  void _showGameOver() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'GAME OVER',
+            style: TextStyle(
+              color: Colors.red, // Set color to red
+              fontWeight: FontWeight.bold,
+              fontSize: 30, // Increase font size
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _restartGame();
+              },
+              child: Text(
+                'Restart',
+                style: TextStyle(
+                  color: Colors.green, // Set color to green
+                  fontSize: 20, // Adjust font size
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -168,6 +220,27 @@ class _MyGameState extends State<MyGame> with TickerProviderStateMixin {
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Text.rich(
+              TextSpan(
+                text: "Time Left: ",
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.white,
+                ),
+                children: [
+                  TextSpan(
+                    text: "$remainingTime seconds",
+                    style: TextStyle(
+                      color: Colors.red, // Set color to red
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -210,7 +283,7 @@ class _MyGameState extends State<MyGame> with TickerProviderStateMixin {
                           style: TextStyle(
                             fontSize: 72,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: Colors.green, // Set color to green
                           ),
                         ),
                       ),
@@ -220,23 +293,24 @@ class _MyGameState extends State<MyGame> with TickerProviderStateMixin {
                 Positioned(
                   left: 16,
                   bottom: 16,
-                  child: Text(
-                    "SCORE: $score seconds",
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  right: 16,
-                  bottom: 16,
-                  child: Text(
-                    "HIGH SCORE: $highScore seconds",
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Moves: $score ",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text(
+                        "Maximum Moves: $highScore ",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
