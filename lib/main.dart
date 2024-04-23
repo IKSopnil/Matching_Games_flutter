@@ -45,6 +45,8 @@ class _MyGameState extends State<MyGame> with TickerProviderStateMixin {
   late Animation<double> _animation;
   bool blastAnimationVisible =
       false; // Track whether blast animation should be visible or not
+  int score = 0;
+  int highScore = 0;
 
   @override
   void initState() {
@@ -80,6 +82,10 @@ class _MyGameState extends State<MyGame> with TickerProviderStateMixin {
       }
     });
     _playSound();
+    score++;
+    if (score > highScore) {
+      highScore = score;
+    }
   }
 
   bool _checkAllSameColor() {
@@ -102,6 +108,11 @@ class _MyGameState extends State<MyGame> with TickerProviderStateMixin {
     setState(() {
       initializeGrid();
       blastAnimationVisible = false; // Reset blast animation visibility
+      if (score < highScore) {
+        highScore =
+            score; // Update high score only if current score beats high score
+      }
+      score = 0;
     });
   }
 
@@ -190,7 +201,44 @@ class _MyGameState extends State<MyGame> with TickerProviderStateMixin {
                       fit: BoxFit.cover,
                     ),
                   ),
+                  Positioned.fill(
+                    child: Center(
+                      child: ScaleTransition(
+                        scale: _animation,
+                        child: Text(
+                          "WIN",
+                          style: TextStyle(
+                            fontSize: 72,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
+                Positioned(
+                  left: 16,
+                  bottom: 16,
+                  child: Text(
+                    "SCORE: $score seconds",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  right: 16,
+                  bottom: 16,
+                  child: Text(
+                    "HIGH SCORE: $highScore seconds",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
