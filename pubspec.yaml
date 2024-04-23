@@ -1,5 +1,5 @@
-name: gpt_game
-description: A new Flutter project.
+name: Color Match
+description: A color matching game for boosting reaction. For children to boost their action and entertaining time spending game.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -57,6 +57,14 @@ flutter:
     - assets/pop.mp3
     - assets/firecracker.gif
     - assets/firecracker.mp3
+    - android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+    - android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+    - android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+    - android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+    - android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+    - ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@1x.png
+    - ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@2x.png
+    - ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@3x.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

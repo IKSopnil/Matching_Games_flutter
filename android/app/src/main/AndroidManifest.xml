@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.gpt_game">
    <application
-        android:label="gpt_game"
+        android:label="Color Match"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
