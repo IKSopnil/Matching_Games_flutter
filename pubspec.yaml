@@ -1,4 +1,4 @@
-name: Color Match
+name: color_match
 description: A color matching game for boosting reaction. For children to boost their action and entertaining time spending game.
 
 # The following line prevents the package from being accidentally published to
@@ -55,6 +55,7 @@ dev_dependencies:
 flutter:
   assets:
     - assets/pop.mp3
+    - assets/logo.gif
     - assets/firecracker.gif
     - assets/firecracker.mp3
     - android/app/src/main/res/mipmap-mdpi/ic_launcher.png

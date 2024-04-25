@@ -50,6 +50,7 @@ class _MyGameState extends State<MyGame> with TickerProviderStateMixin {
   int highScore = 0;
   int remainingTime = 130;
   late Timer _timer;
+  bool _showLogo = true;
 
   @override
   void initState() {
@@ -66,15 +67,10 @@ class _MyGameState extends State<MyGame> with TickerProviderStateMixin {
     );
 
     // Start the timer when the game starts
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+    _timer = Timer(Duration(seconds: 3), () {
       setState(() {
-        remainingTime--;
-        if (remainingTime <= 0) {
-          timer.cancel(); // Stop the timer
-          if (!_checkAllSameColor()) {
-            _showGameOver(); // Display "GAME OVER" if all boxes are not matched
-          }
-        }
+        _showLogo = false;
+        startGameTimer();
       });
     });
   }
@@ -131,6 +127,21 @@ class _MyGameState extends State<MyGame> with TickerProviderStateMixin {
       }
       score = 0;
       remainingTime = 130; // Reset the remaining time
+    });
+    startGameTimer();
+  }
+
+  void startGameTimer() {
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        remainingTime--;
+        if (remainingTime <= 0) {
+          timer.cancel(); // Stop the timer
+          if (!_checkAllSameColor()) {
+            _showGameOver(); // Display "GAME OVER" if all boxes are not matched
+          }
+        }
+      });
     });
   }
 
@@ -204,73 +215,86 @@ class _MyGameState extends State<MyGame> with TickerProviderStateMixin {
             color: Color.fromARGB(255, 255, 255, 255),
           ),
         ),
-        centerTitle: true, // Center the title
+        centerTitle: true,
         backgroundColor:
             Color.fromARGB(255, 7, 7, 7), // Set the AppBar background color
       ),
-      backgroundColor: Color.fromARGB(255, 7, 7, 7),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      backgroundColor:
+          blastAnimationVisible ? Colors.black : Color.fromARGB(255, 7, 7, 7),
+      body: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              "Match the colors of all the boxes",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+          Visibility(
+            visible: _showLogo,
+            child: Center(
+              child: Image.asset(
+                'assets/logo.gif',
+                fit: BoxFit.contain,
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Text.rich(
-              TextSpan(
-                text: "Time Left: ",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white,
-                ),
-                children: [
-                  TextSpan(
-                    text: "$remainingTime seconds",
+          Visibility(
+            visible: !_showLogo,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    "Match the colors of all the boxes",
                     style: TextStyle(
-                      color: Colors.red, // Set color to red
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
                   ),
-                ],
-              ),
-            ),
-          ),
-          Expanded(
-            child: Stack(
-              children: [
-                GridView.builder(
-                  itemCount: rows * columns,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: columns,
-                  ),
-                  itemBuilder: (context, index) {
-                    int row = index ~/ columns;
-                    int col = index % columns;
-                    return GestureDetector(
-                      onTap: () => _onCellTap(row, col),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black),
-                          color: grid[row][col],
-                        ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Text.rich(
+                    TextSpan(
+                      text: "Time Left: ",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
                       ),
-                    );
-                  },
+                      children: [
+                        TextSpan(
+                          text: "$remainingTime seconds",
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: GridView.builder(
+                    itemCount: rows * columns,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: columns,
+                    ),
+                    itemBuilder: (context, index) {
+                      int row = index ~/ columns;
+                      int col = index % columns;
+                      return GestureDetector(
+                        onTap: () => _onCellTap(row, col),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.black),
+                            color: grid[row][col],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 ),
                 // Display the blast animation if all boxes match
                 if (blastAnimationVisible) ...[
                   Positioned.fill(
                     child: Image.asset(
-                      'assets/firecracker.gif', // Adjust the path as per your project structure
+                      'assets/firecracker.gif',
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -283,7 +307,7 @@ class _MyGameState extends State<MyGame> with TickerProviderStateMixin {
                           style: TextStyle(
                             fontSize: 72,
                             fontWeight: FontWeight.bold,
-                            color: Colors.green, // Set color to green
+                            color: Colors.green,
                           ),
                         ),
                       ),
@@ -327,3 +351,4 @@ class _MyGameState extends State<MyGame> with TickerProviderStateMixin {
     );
   }
 }
+
