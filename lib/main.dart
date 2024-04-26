@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:math';
 import 'dart:ui';
-import 'package:flutter/services.dart';
-import 'package:audioplayers/audioplayers.dart';
+
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 void main() {
   runApp(const MyApp());
@@ -87,7 +87,7 @@ class _MyGameState extends State<MyGame> with TickerProviderStateMixin {
       false; // Track whether blast animation should be visible or not
   int score = 0;
   int highScore = 0;
-  int remainingTime = 130;
+  int remainingTime = 100; // Change the initial time to 100 seconds
   late Timer _timer;
 
   @override
@@ -165,11 +165,24 @@ class _MyGameState extends State<MyGame> with TickerProviderStateMixin {
       initializeGrid();
       blastAnimationVisible = false; // Reset blast animation visibility
       if (score < highScore) {
-        highScore =
-            score; // Update high score only if current score beats high score
+        highScore = score; // Update high score only if current score beats high score
       }
       score = 0;
-      remainingTime = 130; // Reset the remaining time
+      remainingTime = 100; // Reset the remaining time to 100 seconds
+    });
+
+    // Restart the timer
+    _timer.cancel(); // Cancel the previous timer
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        remainingTime--;
+        if (remainingTime <= 0) {
+          timer.cancel(); // Stop the timer
+          if (!_checkAllSameColor()) {
+            _showGameOver(); // Display "GAME OVER" if all boxes are not matched
+          }
+        }
+      });
     });
   }
 
